@@ -1,0 +1,31 @@
+name: Test
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Step
+        run: echo "Hello, world!"
+      - run: echo "Hello, world!" > artifact1.txt
+        shell: bash
+      - run: |
+          echo '{"hello": "world"}' > artifact2.json
+        shell: bash
+      - uses: actions/upload-artifact@v3
+        with:
+          name: artifact1
+          path: artifact1.txt
+      - uses: actions/upload-artifact@v3
+        with:
+          name: artifact2
+          path: artifact2.json
+      - uses: actions/upload-artifact@v3
+        with:
+          name: artifact3
+          path: |
+            artifact1.txt
+            artifact2.json

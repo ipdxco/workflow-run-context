@@ -1,0 +1,64 @@
+name: Test Continuation
+on:
+  workflow_run:
+    workflows: [Test]
+    types: [completed]
+jobs:
+  test-continuation:
+    name: Test Continuation
+    runs-on: ubuntu-latest
+    steps:
+      - id: check-run
+        uses: LouisBrunner/checks-action@69aaabbcf32668b60dc03b65deabfe23e92d9c41 # v1.6.0
+        with:
+          token: ${{ github.token }}
+          name: Continuation
+          status: in_progress
+          repo: ${{ github.event.workflow_run.head_repository.full_name }}
+          sha: ${{ github.event.workflow_run.head_commit.id }}
+          details_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      # WARN: Always require approval for all outside collaborators
+      - uses: actions/checkout@v3
+        with:
+          repository: ${{ github.event.workflow_run.head_repository.full_name }}
+          ref: ${{ github.event.workflow_run.head_commit.id }}
+          path: rich-workflow-run
+      - name: Enrich Workflow Run Event
+        uses: ./rich-workflow-run
+        id: workflow-run
+        with:
+          artifact-names: artifact1,artifact2
+      - env:
+          WORKFLOW_RUN_JOBS: ${{ steps.workflow-run.outputs.jobs }}
+        run: jq . <<< "$WORKFLOW_RUN_JOBS"
+        shell: bash
+      - env:
+          WORKFLOW_RUN_LOGS: ${{ steps.workflow-run.outputs.logs }}
+        run: jq . <<< "$WORKFLOW_RUN_LOGS"
+        shell: bash
+      - env:
+          WORKFLOW_RUN_ARTIFACTS: ${{ steps.workflow-run.outputs.artifacts }}
+        run: jq . <<< "$WORKFLOW_RUN_ARTIFACTS"
+        shell: bash
+      - env:
+          TEST_CONTAINS_STEP: ${{ contains(fromJSON(steps.workflow-run.outputs.jobs)['Test'].steps.*.name, 'Step') }}
+          STEP_CONTAINS_LOG: ${{ contains(fromJSON(steps.workflow-run.outputs.logs)['Test/Step'].*.message, 'Hello, world!') }}
+          ARTIFACT1_IS_STRING: ${{ startsWith(fromJSON(steps.workflow-run.outputs.artifacts)['artifact1'].files['artifact1.txt'], 'Hello, world!') }}
+          ARTIFACT2_IS_JSON: ${{ fromJSON(steps.workflow-run.outputs.artifacts)['artifact2'].files['artifact2.json'].hello == 'world' }}
+          ARTIFACT3_HAS_NO_FILES: ${{ fromJSON(steps.workflow-run.outputs.artifacts)['artifact3'].files == null }}
+        run: |
+          test "$TEST_CONTAINS_STEP" = true
+          test "$STEP_CONTAINS_LOG" = true
+          test "$ARTIFACT1_IS_STRING" = true
+          test "$ARTIFACT2_IS_JSON" = true
+          test "$ARTIFACT3_HAS_NO_FILES" = true
+        shell: bash
+      - if: always()
+        uses: LouisBrunner/checks-action@69aaabbcf32668b60dc03b65deabfe23e92d9c41 # v1.6.0
+        with:
+          token: ${{ github.token }}
+          check_id: ${{ steps.check-run.outputs.check_id }}
+          conclusion: ${{ job.status }}
+          repo: ${{ github.event.workflow_run.head_repository.full_name }}
+          sha: ${{ github.event.workflow_run.head_commit.id }}
+          details_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
