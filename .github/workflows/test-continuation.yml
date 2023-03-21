@@ -1,0 +1,36 @@
+name: Test Continuation
+on:
+  workflow_run:
+    workflows: [Test]
+    types: [completed]
+jobs:
+  test-continuation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enrich Workflow Run Event
+        uses: pl-strflt/rich-workflow-run@v1
+        id: workflow-run
+        with:
+          artifact-names: artifacts1,artifacts2
+      - env:
+          WORKFLOW_RUN_JOBS: ${{ steps.workflow-run.outputs.jobs }}
+          WORKFLOW_RUN_LOGS: ${{ steps.workflow-run.outputs.logs }}
+          WORKFLOW_RUN_ARTIFACTS: ${{ steps.workflow-run.outputs.artifacts }}
+        run: |
+          echo "WORKFLOW_RUN_JOBS=$(jq . <<< "$WORKFLOW_RUN_JOBS")"
+          echo "WORKFLOW_RUN_LOGS=$(jq . <<< "$WORKFLOW_RUN_LOGS")"
+          echo "WORKFLOW_RUN_ARTIFACTS=$(jq . <<< "$WORKFLOW_RUN_ARTIFACTS")"
+        shell: bash
+      - env:
+          TEST_CONTAINS_STEP: ${{ contains(fromJSON(steps.workflow-run.outputs.jobs).test.steps.*.name, 'Step') }}
+          STEP_CONTAINS_LOG: ${{ contains(fromJSON(steps.workflow-run.outputs.logs)['test/Step'].*.message, 'Hello, world!') }}
+          ARTIFACT1_IS_STRING: ${{ fromJSON(steps.workflow-run.outputs.artifacts).artifact1.files['artifact1.txt'] == 'Hello, world!' }}
+          ARTIFACT2_IS_JSON: ${{ fromJSON(steps.workflow-run.outputs.artifacts).artifact2.files['artifact2.json'].hello == 'world' }}
+          ARTIFACT3_HAS_NO_FILES: ${{ fromJSON(steps.workflow-run.outputs.artifacts).artifact3.files == null }}
+        run: |
+          test "$TEST_CONTAINS_STEP" = true
+          test "$STEP_CONTAINS_LOG" = true
+          test "$ARTIFACT1_IS_STRING" = true
+          test "$ARTIFACT2_IS_JSON" = true
+          test "$ARTIFACT3_HAS_NO_FILES" = true
+        shell: bash
