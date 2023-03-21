@@ -8,4 +8,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.0] - 2023-03-21
 ### Added
-- v1 of the Rich Workflow Run action.
+- v1 of the Rich Workflow Run action with tests
