@@ -5,15 +5,12 @@ inputs:
   jobs-url:
     description: "Jobs URL"
     required: false
-    default: ${{ github.event.workflow_run.jobs_url }}
   logs-url:
     description: "Logs URL"
     required: false
-    default: ${{ github.event.workflow_run.logs_url }}
   artifacts-url:
     description: "Artifacts URL"
     required: false
-    default: ${{ github.event.workflow_run.artifacts_url }}
   artifact-names:
     description: "A comma-separated list of artifact names to download"
     required: false

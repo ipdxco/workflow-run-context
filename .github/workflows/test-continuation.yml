@@ -27,6 +27,9 @@ jobs:
         uses: ./rich-workflow-run
         id: workflow-run
         with:
+          jobs-url: ${{ github.event.workflow_run.jobs_url }}
+          logs-url: ${{ github.event.workflow_run.logs_url }}
+          artifacts-url: ${{ github.event.workflow_run.artifacts_url }}
           artifact-names: artifact1,artifact2
       - env:
           WORKFLOW_RUN_JOBS: ${{ steps.workflow-run.outputs.jobs }}
