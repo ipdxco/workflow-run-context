@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [1.1.1] - 2023-06-14
+### Fixed
+- Logs parsing: GitHub started using different newlines
+
 ## [1.1.0] - 2023-03-22
 ### Removed
 - Removed input defaults
