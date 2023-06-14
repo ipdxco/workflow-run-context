@@ -64,7 +64,7 @@ runs:
             continue
           fi
           key="$(jq -nr '$file | sub($dir;"") | sub("/\\d+_";"/") | sub("^/";"") | sub("\\.txt";"")' --arg dir "$dir" --arg file "$file")"
-          value="$(jq -Rs 'split("\r\n") | map(select(. == "" | not)) | map(split(" ")) | map({"time": .[0], "message": .[1:] | join(" ")})' "$file")"
+          value="$(jq -Rs 'split("\n") | map(select(. == "" | not)) | map(split(" ")) | map({"time": .[0], "message": .[1:] | join(" ")})' "$file")"
           logs="$(jq -n '$logs | .[$key] = $value' --arg key "$key" --argjson value "$value" --argjson logs "$logs")"
         done <<< "$(find "$dir" -name "*.txt")"
         rm -rf "$dir" "$zip"
