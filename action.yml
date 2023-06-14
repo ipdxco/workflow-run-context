@@ -60,12 +60,20 @@ runs:
         gh api "$LOGS_URL" > "$zip"
         unzip "$zip" -d "$dir"
         while read file; do
+          echo "$file"
           if [[ -z "$file" ]]; then
             continue
           fi
           key="$(jq -nr '$file | sub($dir;"") | sub("/\\d+_";"/") | sub("^/";"") | sub("\\.txt";"")' --arg dir "$dir" --arg file "$file")"
           value="$(jq -Rs 'split("\r\n") | map(select(. == "" | not)) | map(split(" ")) | map({"time": .[0], "message": .[1:] | join(" ")})' "$file")"
           logs="$(jq -n '$logs | .[$key] = $value' --arg key "$key" --argjson value "$value" --argjson logs "$logs")"
+          echo "$key"
+          echo "$value"
+          echo ""
+          echo "$logs"
+          echo ""
+          echo "================"
+          echo ""
         done <<< "$(find "$dir" -name "*.txt")"
         rm -rf "$dir" "$zip"
 
