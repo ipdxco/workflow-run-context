@@ -15,15 +15,15 @@ jobs:
       - run: |
           echo '{"hello": "world"}' > artifact2.json
         shell: bash
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: artifact1
           path: artifact1.txt
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: artifact2
           path: artifact2.json
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: artifact3
           path: |
