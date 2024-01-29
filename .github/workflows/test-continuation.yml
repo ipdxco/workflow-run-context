@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: check-run
-        uses: LouisBrunner/checks-action@fc37386e131fb5857dd162d3d3369b65e5dc070e # v1.6.1
+        uses: LouisBrunner/checks-action@6b626ffbad7cc56fd58627f774b9067e6118af23 # v2.0.0
         with:
           token: ${{ github.token }}
           name: Continuation
@@ -57,7 +57,7 @@ jobs:
           test "$ARTIFACT3_HAS_NO_FILES" = true
         shell: bash
       - if: always()
-        uses: LouisBrunner/checks-action@fc37386e131fb5857dd162d3d3369b65e5dc070e # v1.6.1
+        uses: LouisBrunner/checks-action@6b626ffbad7cc56fd58627f774b9067e6118af23 # v2.0.0
         with:
           token: ${{ github.token }}
           check_id: ${{ steps.check-run.outputs.check_id }}
