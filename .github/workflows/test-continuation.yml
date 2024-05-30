@@ -7,6 +7,8 @@ jobs:
   test-continuation:
     name: Test Continuation
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
     steps:
       - id: check-run
         uses: LouisBrunner/checks-action@fc37386e131fb5857dd162d3d3369b65e5dc070e # v1.6.1
